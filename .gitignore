@@ -1,0 +1,8 @@
+# Folders
+.git/
+.vs/
+*/obj/
+*/bin/
+
+# Files
+devSharp/Config.cs
