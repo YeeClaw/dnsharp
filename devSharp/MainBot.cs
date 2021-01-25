@@ -1,60 +1,60 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.WebSocket;
+using Discord.Commands;
+using devSharp.Services;
 
 namespace devSharp
 {
     class MainBot
     {
-        private readonly DiscordSocketClient _client;
-        private readonly String token = Config.getToken();
-        public static void Main(string[] args)
-        {
-
-            new MainBot().MainAsync().GetAwaiter().GetResult();
-        }
-
-        public MainBot()
-        {
-
-            // Dispose of client when done with this bot
-            _client = new DiscordSocketClient();
-
-            _client.Log += LogAsync;
-            _client.Ready += ReadyAsync;
-            _client.MessageReceived += MessageReceivedAsync;
-        }
+        static void Main(string[] args)
+            => new MainBot().MainAsync().GetAwaiter().GetResult();
 
         public async Task MainAsync()
         {
-            await _client.LoginAsync(TokenType.Bot, token);
-            await _client.StartAsync();
+            // You should dispose a service provider created using ASP.NET
+            // when you are finished using it, at the end of your app's lifetime.
+            // If you use another dependency injection framework, you should inspect
+            // its documentation for the best way to do this.
+            using (var services = ConfigureServices())
+            {
+                var client = services.GetRequiredService<DiscordSocketClient>();
 
-            // Block program until it's closed
-            await Task.Delay(Timeout.Infinite);
+                client.Log += LogAsync;
+                services.GetRequiredService<CommandService>().Log += LogAsync;
+
+                // Tokens should be considered secret data and never hard-coded.
+                // We can read from the environment variable to avoid hardcoding.
+                await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("token"));
+                await client.StartAsync();
+
+                // Here we initialize the logic required to register our commands.
+                await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
+
+                await Task.Delay(Timeout.Infinite);
+            }
         }
 
         private Task LogAsync(LogMessage log)
         {
             Console.WriteLine(log.ToString());
+
             return Task.CompletedTask;
         }
 
-        private Task ReadyAsync()
+        private ServiceProvider ConfigureServices()
         {
-            Console.WriteLine($"{_client.CurrentUser} is connected!");
-            return Task.CompletedTask;
-        }
-
-        private async Task MessageReceivedAsync(SocketMessage message)
-        {
-            if (message.Author.Id == _client.CurrentUser.Id)
-                return;
-
-            if (message.Content == "!ping")
-                await message.Channel.SendMessageAsync("pong! :ping_pong:");
+            return new ServiceCollection()
+                .AddSingleton<DiscordSocketClient>()
+                .AddSingleton<CommandService>()
+                .AddSingleton<CommandHandlingService>()
+                .AddSingleton<HttpClient>()
+                .BuildServiceProvider();
         }
     }
 }
