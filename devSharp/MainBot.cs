@@ -30,7 +30,7 @@ namespace devSharp
 
                 // Tokens should be considered secret data and never hard-coded.
                 // We can read from the environment variable to avoid hardcoding.
-                await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("token"));
+                await client.LoginAsync(TokenType.Bot, Config.getToken());
                 await client.StartAsync();
 
                 // Here we initialize the logic required to register our commands.
