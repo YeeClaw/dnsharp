@@ -3,6 +3,8 @@
 .vs/
 */obj/
 */bin/
+/.idea/
 
 # Files
 devSharp/Config.cs
+dnsharp.sln.DotSettings.user

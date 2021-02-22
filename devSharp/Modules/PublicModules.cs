@@ -1,8 +1,12 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using Discord.API;
 using devSharp.Services;
+using Discord.WebSocket;
 
 namespace devSharp.Modules
 {
@@ -12,8 +16,13 @@ namespace devSharp.Modules
 
         [Command("ping")]
         [Alias("pong", "hello")]
-        public Task PingAsync()
-            => ReplyAsync("pong!");
+        public async Task PingAsync()
+        {
+            long time = DateTime.Now.Millisecond;
+            
+            var message = await Context.Channel.SendMessageAsync("> Pong! :ping_pong:");
+            await message.ModifyAsync(msg => msg.Content = "> Pong! :ping_pong:\n" + (DateTime.Now.Millisecond - time) + "ms");
+        }
 
         // Get info on a user, or the user who invoked the command if one is not specified
         [Command("userinfo")]
@@ -24,7 +33,7 @@ namespace devSharp.Modules
             await ReplyAsync(user.ToString());
         }
 
-        // Ban a user
+        /*
         [Command("ban")]
         [RequireContext(ContextType.Guild)]
         // make sure the user invoking the command can ban
@@ -36,6 +45,7 @@ namespace devSharp.Modules
             await user.Guild.AddBanAsync(user, reason: reason);
             await ReplyAsync("ok!");
         }
+        */
 
         // [Remainder] takes the rest of the command's arguments as one argument, rather than splitting every space
         [Command("echo")]
