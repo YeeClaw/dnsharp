@@ -28,7 +28,7 @@ namespace devSharp.Modules
             
         }
         
-        // Get info on a user, or the user who invoked the command if one is not specified
+        // WIP. Build off of this base template with more information !
         [Command("userinfo")]
         public async Task UserInfoAsync(IUser user = null)
         {
@@ -38,7 +38,7 @@ namespace devSharp.Modules
         }
 
         [Command("+pp")]
-        public async Task ProudPointsAsync(IUser user, int amount)
+        public async Task ProudPointsAsync(IGuildUser user, int amount)
         {
             if (Context.User.Id == 190525744907157505)
             {
