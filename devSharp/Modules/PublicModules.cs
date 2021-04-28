@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
+using System.IO;
 
 namespace devSharp.Modules
 {
@@ -10,6 +10,8 @@ namespace devSharp.Modules
     {
         // Dependency Injection will fill this value in for us
 
+        private string path = Config.getPath();
+        
         [Command("ping")]
         [Alias("pong", "hello")]
         public async Task PingAsync(String pong = null)
@@ -32,7 +34,7 @@ namespace devSharp.Modules
         [Command("userinfo")]
         public async Task UserInfoAsync(IUser user = null)
         {
-            user = user ?? Context.User;
+            user ??= Context.User;
 
             await ReplyAsync(user.ToString());
         }
@@ -43,11 +45,22 @@ namespace devSharp.Modules
             if (Context.User.Id == 190525744907157505)
             {
                 await Context.Channel.SendMessageAsync(user + " has gained " + amount + " proud point(s)!");
+                
+                /*
+                string scoreformat = "" + user.ToString() + "; " + amount;
+                await File.WriteAllTextAsync(path + "\\ProudPointsScore.txt", scoreformat);
+                */
             }
             else
             {
                 await Context.Channel.SendMessageAsync("You don't have permission to use this command");
             }
+        }
+
+        [Command("ppamount")]
+        public async Task CallPointsAsync(IGuildUser user)
+        {
+            //await Context.Channel.SendMessageAsync(user + " has " + amount + " proud point(s)");
         }
     }
 }
